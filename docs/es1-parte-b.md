@@ -20,4 +20,4 @@ Dopo: MFA, dependency scanning
 
 MVP: Client deployato su Vercel, Jobs su un altro servizio gestito
 
-Dopo: AWS
+Dopo: AWS, Kubernetes
