@@ -1,0 +1,68 @@
+{
+  "name": "Debian Safe Sandbox (DinD)",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "enableNonRootDocker": "true",
+      "moby": "true"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "version": "latest",
+      "helm": "none",
+      "minikube": "none"
+    },
+    "ghcr.io/devcontainers/features/aws-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "74th.monokai-charcoal-high-contrast",
+        "bradlc.vscode-tailwindcss",
+        "cardinal90.multi-cursor-case-preserve",
+        "cweijan.dbclient-jdbc",
+        "docker.docker",
+        "ms-vscode.makefile-tools",
+        "qwtel.sqlite-viewer",
+        "humao.rest-client",
+        "mhutchie.git-graph",
+        "vue.volar",
+        "rooveterinaryinc.roo-cline",
+        "ms-ossdata.vscode-pgsql"
+      ]
+    }
+  },
+
+  "postCreateCommand": "npm install -g @openai/codex@latest && echo 'export PATH=$(npm bin -g):$PATH' >> /home/vscode/.bashrc && hash -r",
+
+  // Strip the dev-containers credsStore that VS Code injects into ~/.docker/config.json.
+  // It doesn't implement `store`, which breaks `docker login` (e.g. ECR).
+  "postAttachCommand": "if [ -f ~/.docker/config.json ] && grep -q '\"credsStore\"' ~/.docker/config.json; then jq 'del(.credsStore)' ~/.docker/config.json > ~/.docker/config.json.tmp && mv ~/.docker/config.json.tmp ~/.docker/config.json; fi",
+
+
+  "forwardPorts": [5173],
+
+  "mounts": [
+    "source=${localEnv:HOME}/.codex,target=/home/vscode/.codex,type=bind",
+    "source=${localEnv:HOME}/.kube,target=/home/vscode/.kube,type=bind",
+    "source=${localEnv:HOME}/.aws,target=/home/vscode/.aws,type=bind",
+    "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
+  ],
+
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+  },
+
+  // "runArgs": ["--memory=4g", "--cpus=2"],
+
+  "remoteUser": "vscode"
+}
